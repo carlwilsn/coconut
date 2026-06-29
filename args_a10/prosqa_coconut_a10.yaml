@@ -1,0 +1,37 @@
+# Single-A10 adaptation of args/prosqa_coconut.yaml
+# ProsQA data already ships in data/prosqa_*.json (no preprocessing needed).
+# ProsQA Coconut trains from scratch (load_model_path None), unlike GSM8K.
+# Launch: torchrun --nnodes 1 --nproc_per_node 1 run.py args_a10/prosqa_coconut_a10.yaml
+
+project: coconut
+save_path: checkpoints/prosqa-coconut
+name: prosqa-coconut
+
+only_eval: False
+
+coconut: True
+cot: False
+no_thoughts: False
+no_cot: False
+
+c_thought: 1
+epochs_per_stage: 5
+max_latent_stage: 6
+pad_latent_to_max: True
+
+save_only_improve: False
+uniform_prob: 0.0
+model_id: openai-community/gpt2
+load_model_path: None
+seed: 0
+resume: 0
+bf16: True
+train_path: data/prosqa_train.json
+val_path: data/prosqa_valid.json
+reset_optimizer: True
+batch_size_training: 32
+debug: False
+gradient_accumulation_steps: 4
+num_epochs: 50
+lr: !!float "1e-4"
+weight_decay: 0.01

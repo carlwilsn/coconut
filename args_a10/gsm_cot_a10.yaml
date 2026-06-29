@@ -1,0 +1,38 @@
+# Single-A10 adaptation of args/gsm_cot.yaml
+# Original: 4xA100, batch_size_training 32 -> effective batch 128.
+# A10 (24GB): GPT-2 124M is tiny, batch 32 fits easily. Preserve effective
+# batch 128 via gradient_accumulation_steps 4 on nproc_per_node 1.
+# Launch: torchrun --nnodes 1 --nproc_per_node 1 run.py args_a10/gsm_cot_a10.yaml
+
+project: coconut
+save_path: checkpoints/gsm-cot
+name: gsm-cot
+
+only_eval: False
+
+coconut: False
+cot: True
+no_thoughts: False
+no_cot: False
+
+c_thought: 0
+epochs_per_stage: 1
+max_latent_stage: 0
+pad_latent_to_max: True
+
+save_only_improve: True
+uniform_prob: 0.0
+model_id: openai-community/gpt2
+load_model_path: None
+seed: 0
+resume: 0
+bf16: True
+train_path: data/gsm_train.json
+val_path: data/gsm_valid.json
+reset_optimizer: False
+batch_size_training: 32
+debug: False
+gradient_accumulation_steps: 4
+num_epochs: 25
+lr: !!float "1e-4"
+weight_decay: 0.01
