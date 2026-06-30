@@ -1,0 +1,39 @@
+# Single-A10 ProsQA Coconut "w/o thought" ablation (the brief's named money ablation).
+# no_thoughts=True keeps the SAME multi-stage curriculum as prosqa_coconut but inserts
+# NO continuous latent thoughts — isolating the value of the latent feedback loop.
+# Identical schedule to prosqa_coconut_a10 except coconut->False, no_thoughts->True.
+# Effective batch 128 = micro-batch 16 * grad-accum 8. bf16 on A10.
+# Launch: torchrun --nnodes 1 --nproc_per_node 1 run.py args_a10/prosqa_nothought_a10.yaml
+
+project: coconut
+save_path: checkpoints/prosqa-nothought
+name: prosqa-nothought
+
+only_eval: False
+
+coconut: False
+cot: False
+no_thoughts: True
+no_cot: False
+
+c_thought: 1
+epochs_per_stage: 5
+max_latent_stage: 6
+pad_latent_to_max: True
+
+save_only_improve: False
+uniform_prob: 0.0
+model_id: openai-community/gpt2
+load_model_path: None
+seed: 0
+resume: 0
+bf16: True
+train_path: data/prosqa_train.json
+val_path: data/prosqa_valid.json
+reset_optimizer: True
+batch_size_training: 16
+debug: False
+gradient_accumulation_steps: 8
+num_epochs: 50
+lr: !!float "1e-4"
+weight_decay: 0.01
