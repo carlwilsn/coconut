@@ -1,0 +1,38 @@
+# Single-A10 ProsQA CoT baseline (derived; repo ships only prosqa_coconut).
+# CoT = train on full language reasoning chains, generate them at inference.
+# Mirrors gsm_cot structure (c_thought 0, max_latent_stage 0) on ProsQA, 50 epochs.
+# Effective batch 128 = micro-batch 16 * grad-accum 8. bf16 on A10.
+# Launch: torchrun --nnodes 1 --nproc_per_node 1 run.py args_a10/prosqa_cot_a10.yaml
+
+project: coconut
+save_path: checkpoints/prosqa-cot
+name: prosqa-cot
+
+only_eval: False
+
+coconut: False
+cot: True
+no_thoughts: False
+no_cot: False
+
+c_thought: 0
+epochs_per_stage: 1
+max_latent_stage: 0
+pad_latent_to_max: True
+
+save_only_improve: True
+uniform_prob: 0.0
+model_id: openai-community/gpt2
+load_model_path: None
+seed: 0
+resume: 0
+bf16: True
+train_path: data/prosqa_train.json
+val_path: data/prosqa_valid.json
+reset_optimizer: False
+batch_size_training: 16
+debug: False
+gradient_accumulation_steps: 8
+num_epochs: 50
+lr: !!float "1e-4"
+weight_decay: 0.01
