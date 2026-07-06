@@ -1,0 +1,40 @@
+# FAITHFUL single-A10 adaptation of args/prosqa_coconut.yaml (fp32).
+# ONE change vs the run that plateaued (prosqa_coconut_a10.yaml): bf16 False (fp32).
+# Batch reshaped to preserve the paper's EFFECTIVE batch 128:
+#   paper: 4 GPU x batch 32 x grad_accum 1  = 128
+#   here : 1 GPU x batch 8  x grad_accum 16 = 128   (documented faithful reshape)
+# Every other training-relevant key equals the paper reference exactly.
+# Launch ONLY via DeepDL/repro-gates/faithful_run.sh (faithfulness gate).
+
+project: coconut
+save_path: checkpoints/prosqa-coconut-fp32
+name: prosqa-coconut-fp32
+
+only_eval: False
+
+coconut: True
+cot: False
+no_thoughts: False
+no_cot: False
+
+c_thought: 1
+epochs_per_stage: 5
+max_latent_stage: 6
+pad_latent_to_max: True
+
+save_only_improve: False
+uniform_prob: 0.0
+model_id: openai-community/gpt2
+load_model_path: None
+seed: 0
+resume: 0
+bf16: False
+train_path: data/prosqa_train.json
+val_path: data/prosqa_valid.json
+reset_optimizer: True
+batch_size_training: 8
+debug: False
+gradient_accumulation_steps: 16
+num_epochs: 50
+lr: !!float "1e-4"
+weight_decay: 0.01
