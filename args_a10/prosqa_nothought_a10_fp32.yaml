@@ -1,0 +1,39 @@
+# FAITHFUL single-A10 ProsQA "w/o thought" ablation — FP32 (brief mandates fp32 for latent runs).
+# ONE change vs prosqa_nothought_a10.yaml: bf16 False (fp32). Everything else identical.
+# no_thoughts=True keeps the SAME multi-stage curriculum as prosqa_coconut but inserts
+# NO continuous latent thoughts — isolating the value of the latent feedback loop.
+# Effective batch 128 = micro-batch 8 * grad-accum 16 (matches the fp32 coconut reshape).
+# Launch: torchrun --nnodes 1 --nproc_per_node 1 run.py args_a10/prosqa_nothought_a10_fp32.yaml
+
+project: coconut
+save_path: checkpoints/prosqa-nothought-fp32
+name: prosqa-nothought-fp32
+
+only_eval: False
+
+coconut: False
+cot: False
+no_thoughts: True
+no_cot: False
+
+c_thought: 1
+epochs_per_stage: 5
+max_latent_stage: 6
+pad_latent_to_max: True
+
+save_only_improve: False
+uniform_prob: 0.0
+model_id: openai-community/gpt2
+load_model_path: None
+seed: 0
+resume: 0
+bf16: False
+train_path: data/prosqa_train.json
+val_path: data/prosqa_valid.json
+reset_optimizer: True
+batch_size_training: 8
+debug: False
+gradient_accumulation_steps: 16
+num_epochs: 50
+lr: !!float "1e-4"
+weight_decay: 0.01
