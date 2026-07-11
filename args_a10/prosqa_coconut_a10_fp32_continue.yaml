@@ -1,0 +1,51 @@
+# CONTINUATION of the ProsQA Coconut fp32 run (resume to the ep30 asymptote).
+# ----------------------------------------------------------------------------
+# WHY THIS FILE EXISTS:
+# The original prosqa_coconut_a10_fp32.yaml run was cost-truncated at epoch 19
+# by the driver's 16h per-run wall-clock backstop, while validation accuracy was
+# still CLIMBING (0.83 -> 0.90). test_acc at that cut = 0.888, below the ep30
+# fully-latent asymptote (paper 97.0) and even below the prior 92.67 result.
+# The mission requires the ep30 asymptote and forbids repeating cost-truncation.
+#
+# run.py natively supports preemption-resume: it finds the latest checkpoint in
+# save_path/name (checkpoint_18 on disk, save_only_improve:False saves every
+# epoch), sets resume + load_model_path automatically, and continues. This config
+# is IDENTICAL to prosqa_coconut_a10_fp32.yaml except:
+#   - num_epochs: 50 -> 33   (ceiling: run internal epochs 18..32; stage 6 fully
+#     latent starts at epoch 30, so epochs 30/31/32 observe the asymptote plateau.
+#     Early-cut via pkill when val is flat near target; bump if still climbing.)
+# save_path/name are UNCHANGED so run.py auto-resumes from checkpoint_18.
+# Everything else equals the faithful fp32 config exactly.
+
+project: coconut
+save_path: checkpoints/prosqa-coconut-fp32
+name: prosqa-coconut-fp32
+
+only_eval: False
+
+coconut: True
+cot: False
+no_thoughts: False
+no_cot: False
+
+c_thought: 1
+epochs_per_stage: 5
+max_latent_stage: 6
+pad_latent_to_max: True
+
+save_only_improve: False
+uniform_prob: 0.0
+model_id: openai-community/gpt2
+load_model_path: None
+seed: 0
+resume: 0
+bf16: False
+train_path: data/prosqa_train.json
+val_path: data/prosqa_valid.json
+reset_optimizer: True
+batch_size_training: 8
+debug: False
+gradient_accumulation_steps: 16
+num_epochs: 33
+lr: !!float "1e-4"
+weight_decay: 0.01
