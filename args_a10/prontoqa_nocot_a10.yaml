@@ -1,0 +1,38 @@
+# Single-A10 ProntoQA No-CoT baseline (direct question -> answer, no reasoning steps).
+# Not shipped in the repo; derived from gsm_nocot_a10.yaml (no_cot method flag) on ProntoQA data.
+# bf16 baseline (speed allowance per brief; latent runs are fp32).
+# Effective batch 128 = micro-batch 16 * grad-accum 8.
+# Launch: torchrun --nnodes 1 --nproc_per_node 1 run.py args_a10/prontoqa_nocot_a10.yaml
+
+project: coconut
+save_path: checkpoints/prontoqa-nocot
+name: prontoqa-nocot
+
+only_eval: False
+
+coconut: False
+cot: False
+no_thoughts: False
+no_cot: True
+
+c_thought: 0
+epochs_per_stage: 1
+max_latent_stage: 0
+pad_latent_to_max: True
+
+save_only_improve: True
+uniform_prob: 0.0
+model_id: openai-community/gpt2
+load_model_path: None
+seed: 0
+resume: 0
+bf16: True
+train_path: data/prontoqa_train.json
+val_path: data/prontoqa_valid.json
+reset_optimizer: False
+batch_size_training: 16
+debug: False
+gradient_accumulation_steps: 8
+num_epochs: 50
+lr: !!float "1e-4"
+weight_decay: 0.01

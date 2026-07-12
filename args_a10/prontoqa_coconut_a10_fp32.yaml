@@ -1,0 +1,41 @@
+# FAITHFUL single-A10 adaptation of args/prontoqa_coconut.yaml (fp32, per brief: latent runs fp32).
+# Batch reshaped to preserve the paper's EFFECTIVE batch 128:
+#   paper: 4 GPU x batch 32 x grad_accum 1  = 128
+#   here : 1 GPU x batch 8  x grad_accum 16 = 128   (documented faithful reshape; matches prosqa fp32)
+# Curriculum identical to the shipped prontoqa_coconut: c_thought 1, 6 latent stages, 5 epochs/stage,
+# stay in final stage until 50 epochs, from scratch (load_model_path None, reset_optimizer True).
+# Every other training-relevant key equals the paper reference exactly.
+# Launch: torchrun --nnodes 1 --nproc_per_node 1 run.py args_a10/prontoqa_coconut_a10_fp32.yaml
+
+project: coconut
+save_path: checkpoints/prontoqa-coconut-fp32
+name: prontoqa-coconut-fp32
+
+only_eval: False
+
+coconut: True
+cot: False
+no_thoughts: False
+no_cot: False
+
+c_thought: 1
+epochs_per_stage: 5
+max_latent_stage: 6
+pad_latent_to_max: True
+
+save_only_improve: False
+uniform_prob: 0.0
+model_id: openai-community/gpt2
+load_model_path: None
+seed: 0
+resume: 0
+bf16: False
+train_path: data/prontoqa_train.json
+val_path: data/prontoqa_valid.json
+reset_optimizer: True
+batch_size_training: 8
+debug: False
+gradient_accumulation_steps: 16
+num_epochs: 50
+lr: !!float "1e-4"
+weight_decay: 0.01
