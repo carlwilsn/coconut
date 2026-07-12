@@ -1,0 +1,42 @@
+# Single-A10 FP32 adaptation of args/gsm_coconut.yaml (the mission's Coconut cell).
+# WHY fp32: the brief mandates the latent (Coconut) run in fp32 — bf16 was the
+#   diagnosed plateau gap on ProsQA; latent feedback is precision-sensitive.
+# WHY batch 16 x grad-accum 8 (= effective 128, paper-faithful): PLAN §2 — micro-batch
+#   32 OOMs the A10 on long latent-padded GSM batches; 16x8 is the safe GSM setting.
+# load_model_path is PATCHED AT RUNTIME by run_gsm.py to the best-val CoT checkpoint
+#   (README: "Select a checkpoint as the initialization of Coconut (~40% val)").
+# resume:3 skips the initial CoT stage (stage 0) since the loaded model already did it.
+# Launch: torchrun --nnodes 1 --nproc_per_node 1 run.py args_a10/gsm_coconut_a10_fp32.yaml
+
+project: coconut
+save_path: checkpoints/gsm-coconut
+name: gsm-coconut
+
+only_eval: False
+
+coconut: True
+cot: False
+no_thoughts: False
+no_cot: False
+
+c_thought: 2
+epochs_per_stage: 3
+max_latent_stage: 3
+pad_latent_to_max: True
+
+save_only_improve: False
+uniform_prob: 0.0
+model_id: openai-community/gpt2
+load_model_path: FILL_IN_COT_CHECKPOINT
+seed: 0
+resume: 3
+bf16: False
+train_path: data/gsm_train.json
+val_path: data/gsm_valid.json
+reset_optimizer: True
+batch_size_training: 16
+debug: False
+gradient_accumulation_steps: 8
+num_epochs: 25
+lr: !!float "1e-4"
+weight_decay: 0.01
